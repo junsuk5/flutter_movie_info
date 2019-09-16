@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
       ),
       home: MovieInfoMain(),
     );
@@ -54,7 +54,7 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.blueGrey,
         appBar: AppBar(
           title: Text('영화 정보 검색기'),
         ),
@@ -64,6 +64,7 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      style: TextStyle(color: Colors.white),
                       onChanged: (text) {
                         setState(() {
                           _filteredResult = _movieInfoResult.results
@@ -81,9 +82,9 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
                       itemCount: _filteredResult.length,
                       itemBuilder: (BuildContext context, int index) {
                         return _buildItem(_filteredResult[index]);
-                      }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,
-                      childAspectRatio: 1 / 1.9
-                    ),
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, childAspectRatio: 1 / 1.9),
                     ),
                   ),
                 ],
@@ -92,30 +93,142 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
   }
 
   Widget _buildItem(Results movieInfo) {
-    return Column(
-      children: <Widget>[
-        Card(
-          semanticContainer: true,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailPage(movieInfo)),
+        );
+      },
+      child: Column(
+        children: <Widget>[
+          Card(
+            semanticContainer: true,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
+            child: Hero(
+              tag: movieInfo.posterPath,
+              child: Image.network(
+                _posterPath + movieInfo.posterPath,
+              ),
+            ),
           ),
-          elevation: 5,
-          child: Image.network(
-            _posterPath + movieInfo.posterPath,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                movieInfo.title,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              movieInfo.title,
-              style: TextStyle(color: Colors.white),
+        ],
+      ),
+    );
+  }
+}
+
+class DetailPage extends StatelessWidget {
+  final Results results;
+
+  DetailPage(this.results);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(results.title),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  results.title,
+                  style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.indigo,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Hero(
+                      tag: results.posterPath,
+                      child: Image.network(
+                        'https://image.tmdb.org/t/p/w500' + results.posterPath,
+                        height: 300,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('개봉일 : ${results.releaseDate}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: <Widget>[
+                              Card(
+                                elevation: 5,
+                                color: Colors.blue,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        ' ${results.voteCount}',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Card(
+                                elevation: 5,
+                                color: Colors.blue,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(
+                                    '★ ${results.voteAverage}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                Divider(),
+                Text(results.overview),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
