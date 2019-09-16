@@ -54,6 +54,7 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueGrey,
         appBar: AppBar(
           title: Text('영화 정보 검색기'),
         ),
@@ -76,11 +77,13 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
+                    child: GridView.builder(
                       itemCount: _filteredResult.length,
                       itemBuilder: (BuildContext context, int index) {
                         return _buildItem(_filteredResult[index]);
-                      },
+                      }, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,
+                      childAspectRatio: 1 / 1.9
+                    ),
                     ),
                   ),
                 ],
@@ -88,25 +91,31 @@ class _MovieInfoMainState extends State<MovieInfoMain> {
             : CircularProgressIndicator());
   }
 
-  Padding _buildItem(Results movieInfo) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        child: Column(
-          children: <Widget>[
-            Image.network(
-              _posterPath + movieInfo.posterPath,
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-            Text(
-              movieInfo.title,
-              style: TextStyle(fontSize: 32),
-            ),
-          ],
+  Widget _buildItem(Results movieInfo) {
+    return Column(
+      children: <Widget>[
+        Card(
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 5,
+          child: Image.network(
+            _posterPath + movieInfo.posterPath,
+          ),
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              movieInfo.title,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
